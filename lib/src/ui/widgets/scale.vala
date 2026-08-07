@@ -51,7 +51,13 @@ namespace Tuner {
                 row.activatable_widget = scale;
 
                 binding.bind(adjustment, "value");
-                return row;
+                return new ScaleRow() {
+                    title = title,
+                    subtitle = subtitle,
+                    draw_value = draw_value,
+                    digits = digits,
+                    adjustment = adjustment
+                }.build();
             }
 
             return null;

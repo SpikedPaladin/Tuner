@@ -8,6 +8,7 @@
         <file alias="color-row.ui" preprocess="xml-stripblanks">ui/color-row.ui</file>
         <file alias="combo-row.ui" preprocess="xml-stripblanks">ui/combo-row.ui</file>
         <file alias="font-row.ui" preprocess="xml-stripblanks">ui/font-row.ui</file>
+        <file alias="scale-row.ui" preprocess="xml-stripblanks">ui/scale-row.ui</file>
         <file alias="switch-row.ui" preprocess="xml-stripblanks">ui/switch-row.ui</file>
     </gresource>
 </gresources>

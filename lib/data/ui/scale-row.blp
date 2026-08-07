@@ -1,0 +1,32 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TunerScaleRow : Adw.PreferencesRow {
+
+    Overlay {
+        [overlay]
+        Adw.BreakpointBin breakpoint_bin {
+            width-request: 200;
+            height-request: 1;
+            valign: start;
+
+            Adw.Breakpoint breakpoint {
+                condition ("max-width: 500px")
+            }
+
+            child: Adw.Bin dummy {};
+        }
+
+        child: Box box {
+            orientation: vertical;
+
+            Adw.ActionRow action_row {
+                title: bind template.title;
+                subtitle: bind template.subtitle;
+
+                [suffix]
+                $TunerResetButton reset_button {}
+            }
+        };
+    }
+}

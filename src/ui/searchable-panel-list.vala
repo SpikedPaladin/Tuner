@@ -30,7 +30,6 @@ namespace Tuner {
             search_model = new ListStore(typeof(Page));
             var button = new Gtk.ToggleButton() {
                 css_classes = { "flat" },
-                visible = false,
                 child = new Gtk.Image.from_icon_name("edit-find-symbolic")
             };
             pack_start(button);

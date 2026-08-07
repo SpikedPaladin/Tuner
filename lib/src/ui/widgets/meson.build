@@ -18,6 +18,7 @@ lib_sources += files(
     'panel.vala',
     'reset-button.vala',
     'route.vala',
+    'scale-row.vala',
     'scale.vala',
     'spin.vala',
     'switch-row.vala',
