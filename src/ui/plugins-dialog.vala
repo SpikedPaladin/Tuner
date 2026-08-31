@@ -81,10 +81,10 @@ namespace Tuner {
                 valign = Gtk.Align.CENTER,
                 column_spacing = 12,
                 row_spacing = 4,
-                margin_top = 8,
-                margin_bottom = 8,
-                margin_end = 8,
-                margin_start = 8,
+                margin_top = 6,
+                margin_bottom = 6,
+                margin_end = 6,
+                margin_start = 6,
                 vexpand = true
             };
             var has_grid = false;
@@ -127,7 +127,8 @@ namespace Tuner {
             grid.attach(label, 0, row, 1, 1);
             grid.attach_next_to(new Gtk.Label(label2) {
                 halign = Gtk.Align.START,
-                use_markup = true
+                use_markup = true,
+                wrap = true,
             }, label, Gtk.PositionType.RIGHT, 1, 1);
         }
     }
