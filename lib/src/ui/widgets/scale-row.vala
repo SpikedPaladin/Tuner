@@ -19,9 +19,16 @@ namespace Tuner {
         public Gtk.Scale? marked_scale { get; set; }
         public Gtk.Adjustment? adjustment { get; set; }
 
-        public ScaleRow build() {
+        public ScaleRow build(Binding binding) {
             breakpoint.apply.connect(move_down);
             breakpoint.unapply.connect(move_up);
+
+            binding.bind(adjustment, "value");
+
+            reset_button.reset.connect(binding.reset);
+
+            if (binding.has_default)
+                binding.bind_property("is-default", reset_button, "reveal", BindingFlags.SYNC_CREATE | BindingFlags.INVERT_BOOLEAN);
 
             scale = marked_scale;
 
@@ -47,20 +54,16 @@ namespace Tuner {
         }
 
         private void move_down() {
-            message("down");
-            action_row.activatable_widget = null;
             action_row.remove(scale);
 
             box.append(scale);
         }
 
         private void move_up() {
-            message("up");
             if (scale.parent != null)
                 box.remove(scale);
 
             action_row.add_suffix(scale);
-            action_row.activatable_widget = scale;
         }
     }
 }

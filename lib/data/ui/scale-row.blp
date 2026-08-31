@@ -23,6 +23,7 @@ template $TunerScaleRow : Adw.PreferencesRow {
             Adw.ActionRow action_row {
                 title: bind template.title;
                 subtitle: bind template.subtitle;
+                activatable: false;
 
                 [suffix]
                 $TunerResetButton reset_button {}
