@@ -18,6 +18,7 @@ namespace Tuner {
                     title = title,
                     subtitle = subtitle,
                     draw_value = draw_value,
+                    marked_scale = marked_scale,
                     digits = digits,
                     adjustment = adjustment
                 }.build(binding);
