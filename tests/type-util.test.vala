@@ -83,7 +83,7 @@ void test_value_to_string() {
     assert(Tuner.value_to_string(val_int) == "-123");
 
     var val_int64 = Value(Type.INT64);
-    val_int64.set_int64(1L << 42);
+    val_int64.set_int64(4398046511104);
     assert(Tuner.value_to_string(val_int64) == "4398046511104");
 
     var val_double = Value(Type.DOUBLE);
@@ -299,7 +299,7 @@ void test_convert_to_int() {
 
     val.unset();
     val.init(Type.INT);
-    var v_int64_large = new Variant.int64(1L << 50);
+    var v_int64_large = new Variant.int64(1125899906842624);
     assert(Tuner.convert_to_int(ref val, v_int64_large) == false);  // overflows int
 
     val.unset();
@@ -322,7 +322,7 @@ void test_convert_to_uint() {
 
     val.unset();
     val.init(Type.INT64);
-    var v_uint64_large = new Variant.uint64(1UL << 63);
+    var v_uint64_large = new Variant.uint64(9223372036854775808);
     assert(Tuner.convert_to_uint(ref val, v_uint64_large) == false); // exceeds int64.MAX
 }
 
