@@ -2,6 +2,7 @@ namespace Tuner {
 
     [GtkTemplate (ui = "/org/altlinux/Tuner/panel-list-row.ui")]
     public class PanelListRow : Adw.PreferencesRow {
+        public Item item { get; set; }
         public Page page { get; set; }
         public string icon_name { get; set; }
         public string description { get; set; }
@@ -10,7 +11,30 @@ namespace Tuner {
 
         public Panel panel { get; set; }
 
-        public PanelList? cached_list { get; set; }
+        public PanelListRow.with_item(Item item) {
+            this.item = item;
+
+            if (item is Page) {
+                var page = (Page) item;
+
+                title = page.title;
+                icon_name = page.icon_name;
+
+                if (page.parent != null)
+                    description = SearchUtil.build_path(page);
+                else
+                    description = page.description;
+            } else {
+                var widget = (Widget) item;
+
+                title = SearchUtil.extract_title(widget);
+                description = SearchUtil.build_path(widget);
+                icon_name = SearchUtil.get_page_icon(widget);
+            }
+
+            if (description != null && description != "")
+                show_description = true;
+        }
 
         public PanelListRow(Page page, bool show_description = false) {
             this.page = page;
@@ -27,7 +51,7 @@ namespace Tuner {
                 show_next_icon = true;
 
             if (!page.has_subpages)
-                panel = new Panel.with_page(page);
+                panel = CacheUtil.get_panel(page);
         }
     }
 }

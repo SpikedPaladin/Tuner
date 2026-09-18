@@ -118,19 +118,100 @@ namespace Tuner {
                     if (page.title.down().contains(text.down())) {
                         panel_list.search_model.append(page);
                     }
+                    page.visit_children(item => {
+                        if (item is Group || item is Page) {
+                            if (item is Page) {
+                                var child_page = (Page) item;
+                                if (child_page.title.down().contains(text.down())) {
+                                    panel_list.search_model.append(child_page);
+                                }
+                            }
+                            return VisitResult.RECURSE;
+                        }
+
+                        var widget = item as Widget;
+                        if (widget != null) {
+                            var title = SearchUtil.extract_title(widget);
+
+                            if (title != null && title.down().contains(text.down()))
+                                panel_list.search_model.append(widget);
+                        }
+
+                        return VisitResult.CONTINUE;
+                    });
                 }
             }
         }
 
         [GtkCallback]
-        private void search_result_activated(Page result) {
+        private void search_result_activated(Item result) {
+            if (result is Page) {
+                var page = (Page) result;
+
+                if (page.parent == null)
+                    activate_top_level_page(page);
+                else
+                    activate_page(page, true);
+            } else if (result is Widget) {
+                var widget = (Widget) result;
+                var page = SearchUtil.get_page(widget);
+
+                if (page != null)
+                    activate_page(page, true, widget);
+            }
+        }
+
+        private void activate_top_level_page(Page page) {
             for (int i = 0; i < model.n_items; i++) {
-                var page = (Page) model.get_item(i);
-                if (page == result) {
+                if (model.get_item(i) == page) {
                     panel_list.activate_index(i);
-                    break;
+                    return;
                 }
             }
+        }
+
+        private void activate_page(Page page, bool manual, Widget? focus_widget = null) {
+            if (page.has_subpages) {
+                bool created = false;
+                var list = CacheUtil.get_list(page, out created);
+
+                if (created)
+                    list.row_activated.connect(row_activated);
+
+                nav.push(list);
+                focus_first_leaf(page, list);
+                return;
+            }
+
+            if (page.list != null)
+                nav.push(page.list);
+
+            var panel = CacheUtil.get_panel(page);
+            if (panel == null) return;
+
+            show_page(page, panel, manual);
+
+            if (focus_widget?.native_widget != null)
+                Timeout.add_once(100, () => focus_widget.native_widget.grab_focus());
+        }
+
+        private void focus_first_leaf(Page page, PanelList list) {
+            for (int i = 0; i < page.subpages_model.n_items; i++) {
+                var subpage = (Page) page.subpages_model.get_item(i);
+                if (subpage.has_subpages || subpage.list != null) continue;
+
+                var list_row = list.get_row_at_index(i);
+                if (list_row != null) {
+                    list_row.grab_focus();
+                    activate_row(list_row, false);
+                }
+                break;
+            }
+        }
+
+        private void show_page(Page page, Panel panel, bool manual) {
+            apply_breakpoints(page.breakpoints);
+            set_page(panel, manual);
         }
 
         [GtkCallback]
@@ -140,28 +221,19 @@ namespace Tuner {
 
         private void activate_row(PanelListRow row, bool manual = true) {
             if (row.page.has_subpages) {
-                if (row.cached_list == null) {
-                    var list = new PanelList(row.page);
-                    list.row_activated.connect(row_activated);
-                    row.cached_list = list;
-                }
-                nav.push(row.cached_list);
+                bool created = false;
+                var list = CacheUtil.get_list(row.page, out created);
 
-                for (int i = 0; i < row.page.subpages_model.n_items; i++) {
-                    var page = (Page) row.page.subpages_model.get_item(i);
-                    if (!page.has_subpages && page.list == null) {
-                        var list_row = row.cached_list.get_row_at_index(i);
-                        if (list_row != null) {
-                            list_row.grab_focus();
-                            activate_row(list_row, false);
-                        }
-                        break;
-                    }
-                }
+                if (created)
+                    list.row_activated.connect(row_activated);
+
+                nav.push(list);
+                focus_first_leaf(row.page, list);
                 return;
-            } else if (row.page.list != null) {
-                nav.push(row.page.list);
             }
+
+            if (row.page.list != null)
+                nav.push(row.page.list);
 
             App.settings.set_string("last-page", row.page.id ?? "");
             apply_breakpoints(row.page.breakpoints);

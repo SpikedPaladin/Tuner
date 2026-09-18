@@ -14,7 +14,7 @@ namespace Tuner {
                     return;
                 }
 
-                if (value.get_item_type().is_a(typeof(Page))) {
+                if (value.get_item_type().is_a(typeof(Item))) {
                     _search_model = value;
                     list_box.bind_model(_search_model, create_row);
                 }
@@ -27,7 +27,7 @@ namespace Tuner {
                 selection_mode = Gtk.SelectionMode.NONE
             }, "search");
             list_box.row_activated.connect(activated);
-            search_model = new ListStore(typeof(Page));
+            search_model = new ListStore(typeof(Item));
             var button = new Gtk.ToggleButton() {
                 css_classes = { "flat" },
                 child = new Gtk.Image.from_icon_name("edit-find-symbolic")
@@ -58,18 +58,16 @@ namespace Tuner {
         }
 
         private Gtk.Widget create_row(Object obj) {
-            var page = (Page) obj;
-            var row = new PanelListRow(page, true);
-
-            return row;
+            var item = (Item) obj;
+            return new PanelListRow.with_item(item);
         }
 
         private void activated(Object obj) {
             search_bar.search_mode_enabled = false;
-            search_result_activated(((PanelListRow) obj).page);
+            search_result_activated(((PanelListRow) obj).item);
         }
 
         public signal void update_search(string? text);
-        public signal void search_result_activated(Page page);
+        public signal void search_result_activated(Item item);
     }
 }
